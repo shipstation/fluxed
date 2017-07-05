@@ -20,7 +20,7 @@ export default class MyStore extends Store {
     try {
       const response = await fetch('/login', { method: 'POST' })
       if (response.ok) {
-        cosnt body = await response.json()
+        const body = await response.json()
         this.setState({ userLoggedIn: true })
       }
     } finally {
