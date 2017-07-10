@@ -38,6 +38,15 @@ describe('connect', () => {
     expect(el.text()).to.equal('foo')
   })
 
+  it('does not pass store prototype methods to connected component', () => {
+    const store = new Store({ name: 'foo' })
+    const el = mount(<ConnectedThing store={store} />)
+    const child = el.find(Thing)
+    expect(child.props().name).to.equal('foo')
+    expect(child.props().mount).to.equal(undefined)
+    expect(child.props().setState).to.equal(undefined)
+  })
+
   it('re-renders component when store changes', () => {
     const store = new Store({ name: 'foo' })
     const el = mount(<ConnectedThing store={store} />)
