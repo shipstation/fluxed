@@ -22,6 +22,8 @@ class Thing extends Component {
 
 const ConnectedThing = connect()(Thing)
 
+class SubStore extends Store { }
+
 describe('connect', () => {
   it('hoists statics', () => {
     expect(Thing.myStatic()).to.equal(true)
@@ -39,7 +41,7 @@ describe('connect', () => {
   })
 
   it('does not pass store prototype methods to connected component', () => {
-    const store = new Store({ name: 'foo' })
+    const store = new SubStore({ name: 'foo' })
     const el = mount(<ConnectedThing store={store} />)
     const child = el.find(Thing)
     expect(child.props().name).to.equal('foo')
