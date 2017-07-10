@@ -189,6 +189,10 @@ Subscribes a callback to the store which will be called with the new store state
 
 The current state of the store.  You should avoid accessing this externally, but can be useful in store methods to check the existing state & computing new state from it.
 
+`store.mount(path: string, subStore: Store) => void`
+
+Mounts a subStore at a given path.  The whenever the sub-store is updated, the parent store's subscriptions will also be notified.
+
 ### Provider
 
 `<Provider />` is a higher-order component which has a required `store` property.  Internally provider sets the supplied `store` on the [context](https://facebook.github.io/react/docs/context.html) allowing any `connectedComponent` created via `connect` to access the store given to the `<Provider />` regardless of where the connected components live within the component hierarchy.
@@ -206,9 +210,49 @@ Connect is a function that takes no arguments.  It returns a function which take
 
 _note: react-redux has `mapStateToProps` and `mapDispatchToProps` as arguments to its `connect()` function.  Fluxed doesn't have that at this time._
 
-## TODO
+## Composition
 
-- a way to combine multiple stores or provide multiple stores into connected components.  Using some form of `mapStateToProps` approach.
+In larger apps it's common to break your state up into multiple 'regions' or 'namespaces' where different concerns can be isolated.  Fluxed supports that with the `mount` method on a store which allows you to compose stores by mounting them at different points within parent stores.
+
+example:
+
+```
+class AppStore extends Store {
+
+}
+
+class AuthStore extends Store {
+  async login(username, password) {
+    const res = await fetch('/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    })
+    this.setState({ loggedIn: res.ok })
+  }
+}
+
+class PostStore extends Store {
+  async load() {
+    const res = await fetch('/posts')
+    const list = await res.json()
+    this.setState({ list })
+  }
+}
+
+const store = new AppStore()
+store.mount('auth', AuthStore)
+store.mount('posts', PostStore)
+
+await store.auth.login()
+await store.posts.load()
+
+assert.deepEqual(store.state, {
+  auth: { loggedIn: true },
+  posts: { list: [ /* array of posts here */ ]}
+})
+
+/// etc...
+```
 
 # License
 
