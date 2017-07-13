@@ -13,6 +13,12 @@ export default class Store {
     this.state = Object.assign({}, this.state, newState)
     this.subscriptions.forEach(sub => sub(this.state))
   }
-}
 
+  mount(path, subStore) {
+    subStore.setState(this.state[path])
+    this.state[path] = subStore.state
+    this[path] = subStore
+    subStore.subscribe((newState) => this.setState({ [path]: newState }))
+  }
+}
 

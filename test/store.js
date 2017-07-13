@@ -32,6 +32,11 @@ describe('store', () => {
     store.setState({ test: true })
   })
 
+  it('supports initial state', () => {
+    const store = new Store({ foo: 'bar' })
+    expect(store.state).to.eql({ foo: 'bar' })
+  })
+
   describe('Subclassed', () => {
     class MyStore extends Store {
       state = { name: 'test' }
